@@ -23,7 +23,10 @@
 </table>
 
 <p>Total: <strong th:text="${total}">0</strong></p>
-
+<form th:action="@{/orders/checkout}" method="get">
+    <input type="hidden" name="customerId" th:value="${carts[0].customerId}" />
+    <button type="submit">Thanh toán</button>
+</form>
 <a th:href="@{/products/1}">← Back to products</a>
 </body>
 </html>

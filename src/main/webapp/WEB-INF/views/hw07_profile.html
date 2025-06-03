@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Order History</title>
+</head>
+<body>
+<h2>Order History</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Customer</th>
+        <th>Date</th>
+        <th>Total</th>
+    </tr>
+    <tr th:each="o : ${orders}">
+        <td th:text="${o.id}"></td>
+        <td th:text="${o.customerId}"></td>
+        <td th:text="${#temporals.format(o.orderDate, 'dd-MM-yyyy HH:mm')}"></td>
+        <td th:text="${o.totalAmount}"></td>
+    </tr>
+</table>
+
+<a th:href="@{/products/1}">← Tiếp tục mua sắm</a>
+</body>
+</html>

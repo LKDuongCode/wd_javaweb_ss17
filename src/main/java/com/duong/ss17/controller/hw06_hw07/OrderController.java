@@ -1,70 +1,64 @@
 package com.duong.ss17.controller.hw06_hw07;
 
 import com.duong.ss17.dto.hw06_hw07.CreateOrderDTO;
-import com.duong.ss17.dto.hw06_hw07.OrderHistoryDTO;
-import com.duong.ss17.entity.hw01_hw02.Customer;
-import com.duong.ss17.entity.hw03.Product;
+import com.duong.ss17.entity.hw04_hw05.Cart;
+import com.duong.ss17.entity.hw06_hw07.Order;
 import com.duong.ss17.service.hw04_hw05.CartService;
 import com.duong.ss17.service.hw06_hw07.OrderService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
 @Controller
 @RequestMapping("/orders")
 public class OrderController {
-
-    private final OrderService orderService;
     private final CartService cartService;
+    private final OrderService orderService;
 
-    public OrderController(OrderService orderService, CartService cartService) {
-        this.orderService = orderService;
+    public OrderController(CartService cartService, OrderService orderService) {
         this.cartService = cartService;
+        this.orderService = orderService;
     }
 
     @GetMapping("/checkout")
-    public String showCheckoutForm(Model model, HttpSession session) {
-        Customer customer = (Customer) session.getAttribute("loggedInCustomer");
-        if (customer == null) return "redirect:/auth/login";
+    public String goCheckout(@RequestParam("customerId") int customerId, Model model) {
+        List<Cart> carts = cartService.getCartByCustomer(customerId);
+        double total = cartService.getCartTotal(customerId);
 
-        model.addAttribute("orderDTO", new CreateOrderDTO());
-        return "hw03_order_form";
+        CreateOrderDTO orderDTO = new CreateOrderDTO(customerId, total);
+
+        model.addAttribute("orderDTO", orderDTO);
+        model.addAttribute("carts", carts);
+        return "hw06_checkout";
     }
 
-    @PostMapping("/checkout")
-    public String handleCheckout(@ModelAttribute("orderDTO") CreateOrderDTO dto,
-                                 Model model,
-                                 HttpSession session) {
-        Customer customer = (Customer) session.getAttribute("loggedInCustomer");
-        if (customer == null) return "redirect:/auth/login";
 
-        List<Product> cartProducts = cartService.getProductsInCart(customer.getId());
+    @PostMapping("/confirm")
+    public String confirmOrder(@ModelAttribute("orderDTO") CreateOrderDTO dto,
+                               RedirectAttributes redirectAttributes) {
+        boolean success = orderService.createOrder(dto);
 
-        boolean success = orderService.insert(customer.getId(), cartProducts, dto);
+        if (success) {
+            List<Cart> carts = cartService.getCartByCustomer(dto.getCustomerId());
+            for (Cart c : carts) {
+                cartService.removeCart(c.getId());
+            }
 
-        if (!success) {
-            model.addAttribute("error", "Đặt hàng thất bại. Vui lòng thử lại!");
-            return "hw03_order_form";
+            redirectAttributes.addFlashAttribute("message", "Đặt hàng thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("message", "Đặt hàng thất bại!");
         }
 
-        cartService.clearCart(customer.getId());
-        model.addAttribute("success", "Đặt hàng thành công!");
-        return "redirect:/products/1";
+        return "redirect:/orders/history/" + dto.getCustomerId();
     }
 
-    @GetMapping("/history")
-    public String viewOrderHistory(Model model, HttpSession session) {
-        Customer customer = (Customer) session.getAttribute("loggedInCustomer");
-        if (customer == null) return "redirect:/auth/login";
-
-        List<OrderHistoryDTO> orders = orderService.getOrdersByCustomerId(customer.getId());
+    @GetMapping("/history/{customerId}")
+    public String viewHistory(@PathVariable("customerId") int customerId, Model model) {
+        List<Order> orders = orderService.getOrdersByCustomer(customerId);
         model.addAttribute("orders", orders);
-        return "hw03_order_history";
+        return "hw07_profile";
     }
 }

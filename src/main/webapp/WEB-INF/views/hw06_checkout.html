@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout</title>
+</head>
+<body>
+<h2>Order Confirmation</h2>
+
+<table border="1">
+    <tr>
+        <th>Product ID</th>
+        <th>Quantity</th>
+    </tr>
+    <tr th:each="item : ${carts}">
+        <td th:text="${item.productId}"></td>
+        <td th:text="${item.quantity}"></td>
+    </tr>
+</table>
+
+<p>Total: <strong th:text="${orderDTO.totalAmount}">0</strong></p>
+
+<form th:action="@{/orders/confirm}" method="post" th:object="${orderDTO}">
+    <input type="hidden" th:field="*{customerId}" />
+    <input type="hidden" th:field="*{totalAmount}" />
+    <button type="submit">Xác nhận đặt hàng</button>
+</form>
+</body>
+</html>

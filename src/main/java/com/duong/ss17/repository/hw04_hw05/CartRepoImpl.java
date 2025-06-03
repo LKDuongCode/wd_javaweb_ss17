@@ -2,7 +2,6 @@ package com.duong.ss17.repository.hw04_hw05;
 
 import com.duong.ss17.dto.hw04_hw05.AddCartDTO;
 import com.duong.ss17.dto.hw04_hw05.UpdateCartDTO;
-import com.duong.ss17.entity.hw03.Product;
 import com.duong.ss17.entity.hw04_hw05.Cart;
 import jakarta.transaction.Transactional;
 import org.hibernate.Session;
@@ -71,6 +70,7 @@ public class CartRepoImpl implements CartRepo {
         return false;
     }
 
+
     @Override
     public List<Cart> findByCustomerId(int customerId) {
         return getSession().createQuery(
@@ -94,30 +94,5 @@ public class CartRepoImpl implements CartRepo {
                 .uniqueResult();
 
         return result != null ? result : 0.0;
-    }
-
-
-    @Override
-    public List<Product> getProductsInCart(int customerId) {
-        return getSession().createQuery(
-                        "select p from Product p join Cart c on p.id = c.productId where c.customerId = :id", Product.class)
-                .setParameter("id", customerId)
-                .list();
-    }
-
-    @Override
-    public double getTotalMoney(int customerId) {
-        Double total = getSession().createQuery(
-                        "select sum(p.price * c.quantity) from Product p join Cart c on p.id = c.productId where c.customerId = :id", Double.class)
-                .setParameter("id", customerId)
-                .uniqueResult();
-        return total != null ? total : 0.0;
-    }
-
-    @Override
-    public void clearCart(int customerId) {
-        getSession().createQuery("delete from Cart where customerId = :id")
-                .setParameter("id", customerId)
-                .executeUpdate();
     }
 }

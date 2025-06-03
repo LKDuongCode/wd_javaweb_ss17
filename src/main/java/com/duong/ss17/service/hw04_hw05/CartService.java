@@ -15,8 +15,4 @@ public interface CartService {
 
     List<Cart> getCartByCustomer(int customerId);
     double getCartTotal(int customerId);
-
-    List<Product> getProductsInCart(int customerId);
-    double getTotalMoney(int customerId);
-    void clearCart(int customerId);
 }

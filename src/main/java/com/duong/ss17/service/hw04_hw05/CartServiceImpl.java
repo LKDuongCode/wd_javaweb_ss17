@@ -41,19 +41,4 @@ public class CartServiceImpl implements CartService {
         return cartRepo.calculateTotalPrice(customerId);
     }
 
-
-    @Override
-    public List<Product> getProductsInCart(int customerId) {
-        return cartRepo.getProductsInCart(customerId);
-    }
-
-    @Override
-    public double getTotalMoney(int customerId) {
-        return cartRepo.getTotalMoney(customerId);
-    }
-
-    @Override
-    public void clearCart(int customerId) {
-        cartRepo.clearCart(customerId);
-    }
 }

@@ -11,7 +11,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CreateOrderDTO {
     private int customerId;
-    private String recipientName;
-    private String phoneNumber;
-    private String address;
+    private double totalAmount;
 }
