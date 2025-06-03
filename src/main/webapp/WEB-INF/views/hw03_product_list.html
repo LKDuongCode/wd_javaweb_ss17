@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product List</title>
+</head>
+<body>
+<h2>Product List</h2>
+
+
+<p th:if="${message}" th:text="${message}" style="color:green;"></p>
+
+
+<a th:href="@{/cart/view/1}">View Cart</a>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Quantity</th>
+        <th>Action</th>
+    </tr>
+    <tr th:each="p : ${products}">
+        <td th:text="${p.id}"></td>
+        <td th:text="${p.name}"></td>
+        <td th:text="${p.price}"></td>
+        <td th:text="${p.quantity}"></td>
+        <td>
+            <a th:href="@{/products/detail/{id}(id=${p.id})}">Detail</a>
+            <form th:action="@{/cart/add}" method="post" style="display:inline;">
+                <input type="hidden" name="customerId" value="1"/>
+                <input type="hidden" name="productId" th:value="${p.id}"/>
+                <input type="number" name="quantity" value="1" min="1" style="width: 50px;"/>
+                <button type="submit">Add to Cart</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+
+<div>
+    <p>Page <span th:text="${curPage}"></span> / <span th:text="${totalPage}"></span></p>
+    <div>
+        <a th:if="${curPage > 1}" th:href="@{/products/{p}(p=${curPage - 1})}">← Previous</a>
+        <a th:if="${curPage < totalPage}" th:href="@{/products/{p}(p=${curPage + 1})}">Next →</a>
+    </div>
+</div>
+</body>
+</html>
